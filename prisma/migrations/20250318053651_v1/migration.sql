@@ -1,11 +1,8 @@
--- CreateTable
-CREATE TABLE "City" (
+CREATE TABLE "contact" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "countryCode" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
 
-    CONSTRAINT "City_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "contact_pkey" PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "City_countryCode_key" ON "City"("countryCode");

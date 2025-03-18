@@ -1,86 +1,52 @@
-import { serve } from "@hono/node-server";
-import { Hono } from "hono";
-import { prismaClient } from "./prisma";
+import { serve } from '@hono/node-server'
+import { Hono } from 'hono'
+import { prismaClient } from "./prisma.js";
 
-const hono = new Hono();
 
-hono.get("/countries", async (context) => {
-  const countries = await prismaClient.country.findMany();
+const app = new Hono()
+const prisma = prismaClient
 
-  return context.json(
-    {
-      countries,
-    },
-    200
-  );
+app.get('/contact', async (c) => {
+  const contacts = await prisma.contact.findMany();
+  return c.json(contacts, 200)
 });
 
-hono.post("/countries", async (context) => {
-  const { name, countryCode } = await context.req.json();
-
-  const country = await prismaClient.country.create({
+app.post('/contact', async (c) => {
+  const { name, email, phone } = await c.req.json();
+  const contact = await prisma.contact.create({
     data: {
       name,
-      countryCode,
+      email,
+      phone,
     },
   });
-
-  return context.json(
-    {
-      country,
-    },
-    201
-  );
+  return c.json(contact, 201);
 });
 
-hono.patch("/countries/:countryCode", async (context) => {
-  const { countryCode } = context.req.param();
-  const { name } = await context.req.json();
-
-  const country = await prismaClient.country.update({
-    where: {
-      countryCode,
-    },
+app.patch('/contact/:id', async (c) => {
+  const { id } = c.req.param();
+  const { name, email, phone } = await c.req.json();
+  const contact = await prisma.contact.update({
+    where: { id: id },
     data: {
       name,
+      email,
+      phone,
     },
   });
+  return c.json(contact, 200);
+}
+);
 
-  return context.json(
-    {
-      country,
-    },
-    200
-  );
-});
-
-hono.delete("/countries/:countryCode", async (context) => {
-  const { countryCode } = context.req.param();
-
-  const existingCountry = await prismaClient.country.findUnique({
-    where: {
-      countryCode,
-    },
+app.delete('/contact/:id', async (c) => {
+  const { id } = c.req.param();
+  await prisma.contact.delete({
+    where: { id: id },
   });
-
-  if (existingCountry) {
-    await prismaClient.country.delete({
-      where: {
-        countryCode,
-      },
-    });
-
-    return context.json(
-      {
-        country: existingCountry,
-      },
-      200
-    );
-  } else {
-    return context.notFound();
-  }
+  return c.json({ message: 'Contact deleted' }, 200);
 });
 
-serve(hono, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`);
-});
+app.post
+
+serve(app);
+console.log('Server running on http://localhost:3000');

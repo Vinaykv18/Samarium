@@ -7,8 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Country {
-  id          String @id @default(uuid())
-  name        String
-  countryCode String @unique
+model contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
 }
